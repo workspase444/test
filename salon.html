@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Barbers Pro | حجز موعد</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #0f0f0f;
+            color: #e0e0e0;
+        }
+        .luxury-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .gold-text { color: #d4af37; }
+        .btn-booking {
+            background-color: #d4af37;
+            color: #000;
+            transition: 0.3s;
+        }
+        .btn-booking:hover { background-color: #b8962e; }
+        input {
+            background: #222 !important;
+            border: 1px solid #444 !important;
+            color: white !important;
+        }
+        #ticket-section { display: none; }
+
+        /* تنسيق الطباعة لتحويل التذكرة لملف PDF بشكل جميل */
+        @media print {
+            body * { visibility: hidden; }
+            #ticket-section, #ticket-section * { visibility: visible; }
+            #ticket-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                border: none;
+                box-shadow: none;
+                background: white !important;
+                color: black !important;
+            }
+            .gold-text { color: #000 !important; font-weight: bold; }
+            .no-print { display: none; }
+            .bg-[#222] { background: #f0f0f0 !important; border: 1px solid #ccc; }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div id="booking-card" class="luxury-card w-full max-w-md p-8 rounded-2xl">
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold gold-text">يــوسـفـ   وفـاروقـ   لـلـحـلاقــة</h1>
+            <p class="text-gray-500 text-sm">Elite Barbers Pro</p>
+        </div>
+
+        <div class="space-y-5">
+            <div>
+                <label class="block text-xs mb-2 text-gray-400">الاسم واللقب</label>
+                <div class="flex gap-2">
+                    <input type="text" id="fname" placeholder="الاسم" class="w-1/2 p-3 rounded-lg outline-none">
+                    <input type="text" id="lname" placeholder="اللقب" class="w-1/2 p-3 rounded-lg outline-none">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs mb-2 text-gray-400">رقم الهاتف</label>
+                <input type="tel" id="phone" placeholder="0XXXXXXXX" class="w-full p-3 rounded-lg outline-none" maxlength="10"minlength="10">
+            </div>
+
+            <button onclick="generateTicket()" class="btn-booking w-full py-3 rounded-lg font-bold mt-4">
+                تأكيد الحجز والحصول على التذكرة
+            </button>
+        </div>
+    </div>
+
+    <div id="ticket-section" class="luxury-card w-full max-w-md p-8 rounded-2xl text-center border-dashed border-2 border-gold-text">
+        <div class="mb-4">
+            <h2 class="gold-text text-xl font-bold">تذكرة حجز موعد</h2>
+            <p class="text-xs text-gray-400">يرجى الاستظهار هذه التذكرة عند الدخول</p>
+        </div>
+        
+        <div class="bg-[#222] p-6 rounded-xl my-6 space-y-3 text-right border border-gray-700">
+            <p class="text-sm flex justify-between"><span class="text-gray-500">الاسم واللقب:</span> <span id="res-name" class="font-bold"></span></p>
+            <p class="text-sm flex justify-between"><span class="text-gray-500">رقم الهاتف:</span> <span id="res-phone"></span></p>
+            <hr class="border-gray-700 my-2">
+            <p class="text-sm flex justify-between"><span class="text-gray-500 text-lg">موعد الاستقبال:</span> <span id="res-time" class="gold-text font-bold text-lg"></span></p>
+            <p class="text-sm flex justify-between font-bold italic"><span class="text-gray-500">رقم الحجز:</span> <span id="res-id"></span></p>
+        </div>
+
+        <div class="no-print space-y-3">
+            <button onclick="window.print()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-bold transition">
+                تحميل التذكرة (PDF)
+            </button>
+            <button onclick="location.reload()" class="w-full bg-transparent border border-gray-500 text-gray-400 py-2 rounded-lg font-bold hover:bg-gray-800 transition">
+                حجز موعد آخر
+            </button>
+        </div>
+        
+        <p class="mt-4 text-[10px] text-gray-500 no-print text-center">ملاحظة: المواعيد تتغير تلقائياً حسب أولوية الحجز</p>
+    </div>
+<script>
+    const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxJbrpFZfRqCOhrOlPHp527NeqMmtF4VDG5MzE9Ke7XcBpiS1aXrx_LOlarXu6Ac0VFxA/exec';
+ 
+
+async function generateTicket() {
+    const fname = document.getElementById('fname').value.trim();
+    const lname = document.getElementById('lname').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+
+    // التصحيح: استخدام || بدلاً من المسافات
+    if (!fname  ||!lname || !phone) {
+        alert("يرجى إكمال جميع البيانات");
+        return;
+    }
+
+    if (phone.length < 10) {
+        alert("رقم الهاتف يجب أن يكون 10 أرقام على الأقل");
+        return;
+    }
+
+    const btn = document.querySelector('.btn-booking');
+    const originalText = btn.innerText;
+    btn.innerText = "جاري الحجز...";
+    btn.disabled = true;
+
+    try {
+        // استخدام FormData بدلاً من JSON لتجنب مشاكل CORS
+        const formData = new URLSearchParams();
+        formData.append('name', fname + " " + lname);
+        formData.append('phone', phone);
+
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        });
+
+        const result = await response.json();
+
+        if (result.result === "success") {
+            document.getElementById('res-name').innerText = fname + " " + lname;
+            document.getElementById('res-phone').innerText = phone;
+            document.getElementById('res-id').innerText = result.ticketId;
+            document.getElementById('res-time').innerText = result.appointment;
+
+            document.getElementById('booking-card').style.display = 'none';
+            document.getElementById('ticket-section').style.display = 'block';
+        } else {
+            alert("حدث خطأ: " + (result.error || "يرجى المحاولة مرة أخرى"));
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("حدث خطأ في الاتصال. يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.");
+        btn.innerText = originalText;
+        btn.disabled = false;
+    }
+}
+</script>
+
+</body>
+</html>
