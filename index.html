@@ -1,25 +1,547 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
-    <link rel="stylesheet" href="Login.css">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LOGIN</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حاسبة معدل الباكالوريا الجزائري</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #f0ede8;
+    --surface:  #faf9f7;
+    --surface2: #f2f0ec;
+    --border:   #e2ddd6;
+    --text:     #1c1a17;
+    --text-dim: #9a9590;
+    --accent:   #2a6049;
+    --accent-l: #3a7d60;
+    --green:    #2a6049;
+    --red:      #c0392b;
+    --radius:   16px;
+  }
+
+  body {
+    font-family: 'Tajawal', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 16px 72px;
+  }
+
+  /* ── Header ── */
+  .page-header {
+    text-align: center;
+    margin-bottom: 32px;
+    animation: fadeDown 0.5s ease both;
+  }
+
+  .flag-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 5px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-dim);
+    letter-spacing: 1.5px;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-size: clamp(24px, 5vw, 38px);
+    font-weight: 900;
+    color: var(--text);
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+
+  h1 span {
+    color: var(--accent);
+  }
+
+  .subtitle {
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 32px 28px;
+    width: 100%;
+    max-width: 560px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
+    animation: fadeUp 0.5s ease 0.08s both;
+  }
+
+  /* ── Section label ── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  /* ── Branch Selector ── */
+  .branch-section { margin-bottom: 28px; }
+
+  .branch-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .branch-btn {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-dim);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .branch-btn .icon { font-size: 20px; display: block; margin-bottom: 5px; }
+
+  .branch-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: #edf4f0;
+  }
+
+  .branch-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(42,96,73,0.25);
+  }
+
+  /* ── Divider ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 24px 0;
+  }
+
+  /* ── Subjects ── */
+  .subjects-section { margin-bottom: 24px; }
+
+  .subjects-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .subject-row {
+    display: grid;
+    grid-template-columns: 1fr auto 100px;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    transition: border-color 0.15s;
+  }
+
+  .subject-row:hover { border-color: #ccc8c0; }
+  .subject-row:focus-within { border-color: var(--accent); background: #edf4f0; }
+
+  .subject-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .coeff-badge {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .grade-input {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    color: var(--text);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    padding: 7px 4px;
+    width: 100%;
+    outline: none;
+    transition: all 0.15s;
+    direction: ltr;
+  }
+
+  .grade-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(42,96,73,0.10);
+  }
+
+  .grade-input.error { border-color: var(--red); background: #fdf3f2; }
+  .grade-input.valid { border-color: #7fbfa5; }
+  .grade-input::placeholder { color: #c8c4bc; font-size: 12px; font-weight: 400; }
+
+  /* ── Buttons ── */
+  .btn-group { display: flex; flex-direction: column; gap: 10px; }
+
+  .calc-btn {
+    width: 100%;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.3px;
+  }
+
+  .calc-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 50%, transparent 100%);
+    transform: translateX(-100%);
+    transition: transform 0.5s ease;
+  }
+
+  .calc-btn:hover {
+    background: var(--accent-l);
+    box-shadow: 0 6px 20px rgba(42,96,73,0.3);
+    transform: translateY(-1px);
+  }
+  .calc-btn:hover::after { transform: translateX(100%); }
+  .calc-btn:active { transform: translateY(0); box-shadow: none; }
+
+  .reset-btn {
+    width: 100%;
+    background: transparent;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-dim);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .reset-btn:hover { border-color: #b0aba3; color: var(--text); background: var(--surface2); }
+
+  /* ── Result ── */
+  .result-box {
+    margin-top: 24px;
+    border-radius: 16px;
+    padding: 28px 20px;
+    text-align: center;
+    border: 1.5px solid;
+    animation: popIn 0.45s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+
+  .result-box.pass {
+    background: #edf7f2;
+    border-color: #a8d9c0;
+  }
+  .result-box.fail {
+    background: #fdf3f2;
+    border-color: #f0b8b3;
+  }
+
+  .result-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+
+  .result-score {
+    font-size: clamp(52px, 12vw, 76px);
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .result-box.pass .result-score { color: var(--green); }
+  .result-box.fail .result-score { color: var(--red); }
+
+  .result-status {
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+  .result-box.pass .result-status { color: var(--green); }
+  .result-box.fail .result-status { color: var(--red); }
+
+  .result-detail {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 8px;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .result-detail span {
+    background: rgba(0,0,0,0.05);
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  /* ── Error ── */
+  .error-msg {
+    background: #fdf3f2;
+    border: 1px solid #f0b8b3;
+    border-radius: 12px;
+    color: var(--red);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 14px 16px;
+    text-align: right;
+    margin-top: 16px;
+    line-height: 1.8;
+    animation: shake 0.38s ease;
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: none; } }
+  @keyframes fadeUp   { from { opacity: 0; transform: translateY(20px);  } to { opacity: 1; transform: none; } }
+  @keyframes popIn    { from { opacity: 0; transform: scale(0.92); }      to { opacity: 1; transform: none; } }
+  @keyframes shake    {
+    0%,100% { transform: translateX(0); }
+    20%     { transform: translateX(-5px); }
+    40%     { transform: translateX(5px); }
+    60%     { transform: translateX(-3px); }
+    80%     { transform: translateX(3px); }
+  }
+
+  @media(max-width: 480px) {
+    .card { padding: 24px 18px; }
+    .subject-row { grid-template-columns: 1fr auto 84px; gap: 8px; padding: 9px 12px; }
+    .subject-name { font-size: 13px; }
+    .branch-btn { font-size: 12px; padding: 12px 6px; }
+  }
+</style>
 </head>
 <body>
-    <div class="loginpage">
-    <h2>LOGIN</h2>
-    <form action="" method="post">
-     <div class="input"> 
-    <input type="text" placeholder="Username" required><br>
-    </div>
-    <div class="input">
-    <input type="password" placeholder="Password" required><br>
-    </div>
-    <button class="loginbtn">Login</button>
-    </form>
-    </div>
 
-    
+<header class="page-header">
+  <div class="flag-badge">🇩🇿 الجزائر &nbsp;·&nbsp; BAC 2025</div>
+  <h1>حاسبة معدل <span>الباكالوريا</span></h1>
+  <p class="subtitle">احسب معدلك بدقة حسب شعبتك</p>
+</header>
+
+<div class="card">
+
+  <div class="branch-section">
+    <div class="section-label">الشعبة</div>
+    <div class="branch-grid">
+      <button class="branch-btn active" onclick="setBranch('science',this)">
+        <span class="icon">🔬</span>علوم تجريبية
+      </button>
+      <button class="branch-btn" onclick="setBranch('math',this)">
+        <span class="icon">📐</span>رياضيات
+      </button>
+      <button class="branch-btn" onclick="setBranch('letters',this)">
+        <span class="icon">📚</span>آداب وفلسفة
+      </button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="subjects-section">
+    <div class="section-label">النقاط</div>
+    <div class="subjects-grid" id="subjects-grid"></div>
+  </div>
+
+  <div class="btn-group">
+    <button class="calc-btn" onclick="calculate()">⚡ احسب المعدل</button>
+    <button class="reset-btn" onclick="resetAll()">↺ إعادة تعيين</button>
+  </div>
+
+  <div id="result-area"></div>
+</div>
+
+<script>
+const BRANCHES = {
+  science: {
+    name: 'علوم تجريبية',
+    subjects: [
+      { name: 'رياضيات',          coeff: 5 },
+      { name: 'فيزياء',            coeff: 6 },
+      { name: 'علوم طبيعية',       coeff: 6 },
+      { name: 'اللغة العربية',      coeff: 3 },
+      { name: 'اللغة الفرنسية',     coeff: 2 },
+      { name: 'اللغة الإنجليزية',   coeff: 2 },
+      { name: 'فلسفة',             coeff: 2 },
+      { name: 'تاريخ وجغرافيا',    coeff: 2 },
+      { name: 'علوم إسلامية',      coeff: 2 },
+      { name: 'تربية بدنية',       coeff: 1 },
+    ]
+  },
+  math: {
+    name: 'رياضيات',
+    subjects: [
+      { name: 'رياضيات',          coeff: 7 },
+      { name: 'فيزياء',            coeff: 6 },
+      { name: 'علوم طبيعية',       coeff: 2 },
+      { name: 'اللغة العربية',      coeff: 3 },
+      { name: 'اللغة الفرنسية',     coeff: 2 },
+      { name: 'اللغة الإنجليزية',   coeff: 2 },
+      { name: 'فلسفة',             coeff: 2 },
+      { name: 'تاريخ وجغرافيا',    coeff: 2 },
+      { name: 'علوم إسلامية',      coeff: 2 },
+      { name: 'تربية بدنية',       coeff: 1 },
+    ]
+  },
+  letters: {
+    name: 'آداب وفلسفة',
+    subjects: [
+      { name: 'اللغة العربية',      coeff: 5 },
+      { name: 'اللغة الفرنسية',     coeff: 5 },
+      { name: 'اللغة الإنجليزية',   coeff: 5 },
+      { name: 'فلسفة',             coeff: 6 },
+      { name: 'تاريخ وجغرافيا',    coeff: 4 },
+      { name: 'علوم إسلامية',      coeff: 2 },
+      { name: 'رياضيات',          coeff: 2 },
+      { name: 'تربية بدنية',       coeff: 1 },
+    ]
+  }
+};
+
+let currentBranch = 'science';
+
+function setBranch(branch, btn) {
+  currentBranch = branch;
+  document.querySelectorAll('.branch-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSubjects();
+  document.getElementById('result-area').innerHTML = '';
+}
+
+function renderSubjects() {
+  const grid = document.getElementById('subjects-grid');
+  const subjects = BRANCHES[currentBranch].subjects;
+  grid.innerHTML = subjects.map((s, i) => `
+    <div class="subject-row">
+      <span class="subject-name">${s.name}</span>
+      <span class="coeff-badge">×${s.coeff}</span>
+      <input
+        class="grade-input"
+        type="number"
+        id="grade-${i}"
+        min="0" max="20" step="0.25"
+        placeholder="0 – 20"
+        oninput="validateInput(this)"
+      />
+    </div>
+  `).join('');
+}
+
+function validateInput(input) {
+  const val = parseFloat(input.value);
+  if (input.value === '') {
+    input.classList.remove('error', 'valid');
+  } else if (isNaN(val) || val < 0 || val > 20) {
+    input.classList.add('error');
+    input.classList.remove('valid');
+  } else {
+    input.classList.add('valid');
+    input.classList.remove('error');
+  }
+}
+
+function calculate() {
+  const subjects = BRANCHES[currentBranch].subjects;
+  let totalWeighted = 0, totalCoeff = 0;
+  let errors = [];
+
+  subjects.forEach((s, i) => {
+    const input = document.getElementById(`grade-${i}`);
+    const raw = input.value.trim();
+    if (raw === '') {
+      errors.push(`${s.name} — فارغة`);
+      input.classList.add('error');
+      return;
+    }
+    const val = parseFloat(raw);
+    if (isNaN(val) || val < 0 || val > 20) {
+      errors.push(`${s.name} — قيمة غير صحيحة (0–20)`);
+      input.classList.add('error');
+      return;
+    }
+    totalWeighted += val * s.coeff;
+    totalCoeff += s.coeff;
+  });
+
+  const area = document.getElementById('result-area');
+
+  if (errors.length > 0) {
+    area.innerHTML = `<div class="error-msg">⚠️ يرجى تصحيح الأخطاء التالية:<br>${errors.map(e => '· ' + e).join('<br>')}</div>`;
+    return;
+  }
+
+  const avg = totalWeighted / totalCoeff;
+  const pass = avg >= 10;
+  const branchName = BRANCHES[currentBranch].name;
+
+  area.innerHTML = `
+    <div class="result-box ${pass ? 'pass' : 'fail'}">
+      <div class="result-label">${branchName} — نتيجة الباكالوريا</div>
+      <div class="result-score">${avg.toFixed(2)}</div>
+      <div class="result-status">${pass ? '✅ ناجح' : '❌ راسب'}</div>
+      <div class="result-detail">
+        <span>المعاملات: ${totalCoeff}</span>
+        <span>المجموع: ${totalWeighted.toFixed(2)}</span>
+      </div>
+    </div>
+  `;
+}
+
+function resetAll() {
+  const subjects = BRANCHES[currentBranch].subjects;
+  subjects.forEach((_, i) => {
+    const input = document.getElementById(`grade-${i}`);
+    if (input) { input.value = ''; input.classList.remove('error', 'valid'); }
+  });
+  document.getElementById('result-area').innerHTML = '';
+}
+
+renderSubjects();
+</script>
 </body>
 </html>
